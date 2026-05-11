@@ -37,17 +37,6 @@ if pp:
     new_pp_parts.append(pp)
 os.environ['PYTHONPATH'] = os.pathsep.join(new_pp_parts)
 
-# Monkey-patch vLLM EngineArgs to default enforce_eager=True,
-# so we don't need to modify the cosyvoice submodule source.
-try:
-    from vllm.engine.arg_utils import EngineArgs as _EngineArgs
-    _engine_args_init = _EngineArgs.__init__
-    def _engine_args_patched(self, *args, **kwargs):
-        kwargs.setdefault('enforce_eager', True)
-        _engine_args_init(self, *args, **kwargs)
-    _EngineArgs.__init__ = _engine_args_patched
-except ImportError:
-    pass
 
 # ── Imports ──────────────────────────────────────────────────────────────────
 
@@ -103,6 +92,17 @@ class CosyVoiceModelLoader:
 
     def load_model(self, model_path, vllm):
         if vllm:
+            # only patch EngineArgs when CosyVoice uses vLLM
+            try:
+                from vllm.engine.arg_utils import EngineArgs as _EArgs
+                _orig_init = _EArgs.__init__
+                def _patched_init(self_, *a, **kw):
+                    kw.setdefault('enforce_eager', True)
+                    kw['gpu_memory_utilization'] = 0.05
+                    _orig_init(self_, *a, **kw)
+                _EArgs.__init__ = _patched_init
+            except ImportError:
+                pass
             model = CosyVoice2(model_path, load_jit=True, load_trt=True, load_vllm=True, fp16=False)
         else:
             model = CosyVoice2(model_path)
