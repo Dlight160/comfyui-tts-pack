@@ -80,7 +80,7 @@ class CosyVoiceModelLoader:
         return {
             "required": {
                 "model_path": ("STRING", {"default": COSY_DEFAULT_MODEL_PATH}),
-                "vllm": ("BOOLEAN", {"default": False}),
+                "vllm": ("BOOLEAN", {"default": True}),
             },
         }
 
@@ -192,10 +192,6 @@ FISH_DEFAULT_LLAMA_PATH = os.environ.get(
     "FISH_LLAMA_PATH",
     os.path.join(os.path.dirname(current_dir), "models", "tts", "fish-speech", "fs-int8"),
 )
-FISH_DEFAULT_DECODER_PATH = os.environ.get(
-    "FISH_DECODER_PATH",
-    os.path.join(FISH_DEFAULT_LLAMA_PATH, "codec.pth"),
-)
 
 _FISH_MODEL_CACHE: dict[tuple, TTSInferenceEngine] = {}
 _FISH_PATCHED_SEND_LLAMA = False
@@ -261,12 +257,10 @@ class FishSpeechModelLoader:
         return {
             "required": {
                 "llama_checkpoint_path": ("STRING", {"default": FISH_DEFAULT_LLAMA_PATH}),
-                "decoder_checkpoint_path": ("STRING", {"default": FISH_DEFAULT_DECODER_PATH}),
-                "decoder_config_name": ("STRING", {"default": "modded_dac_vq"}),
                 "device": (["auto", "cuda", "mps", "cpu"], {"default": "auto"}),
                 "decoder_device": (["same_as_model", "cpu"], {"default": "same_as_model"}),
                 "precision": (["bfloat16", "float16"], {"default": "bfloat16"}),
-                "compile": ("BOOLEAN", {"default": False}),
+                "compile": ("BOOLEAN", {"default": True}),
             }
         }
 
@@ -279,8 +273,6 @@ class FishSpeechModelLoader:
     def load_model(
         self,
         llama_checkpoint_path: str,
-        decoder_checkpoint_path: str,
-        decoder_config_name: str,
         device: str,
         decoder_device: str,
         precision: str,
@@ -292,10 +284,11 @@ class FishSpeechModelLoader:
         )
         torch_precision = torch.half if precision == "float16" else torch.bfloat16
 
+        decoder_checkpoint_path = os.path.join(llama_checkpoint_path, "codec.pth")
+        decoder_config_name = "modded_dac_vq"
+
         cache_key = (
             os.path.abspath(llama_checkpoint_path),
-            os.path.abspath(decoder_checkpoint_path),
-            decoder_config_name,
             resolved_device,
             resolved_decoder_device,
             str(torch_precision),

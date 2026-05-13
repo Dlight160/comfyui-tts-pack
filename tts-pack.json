@@ -1,0 +1,123 @@
+{
+  "43": {
+    "inputs": {
+      "model_path": "/mist/dengliang/cosy/pretrained_models/CosyVoice2-0.5B",
+      "vllm": true
+    },
+    "class_type": "CosyVoiceModelLoader",
+    "_meta": {
+      "title": "CosyVoiceModelLoader ARG:{model_path=>cosyvoice_model_path<#label>,vllm=>vllm<#bool>}"
+    }
+  },
+  "49": {
+    "inputs": {
+      "value": "怎么会离开呢，嗯？是觉得姐姐这里吸引不了你吗，还是说有其他的人更吸引。你带我看看他是什么样子的，然后，我会让你下一次见不到他。"
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "Prompt Text ARG:{value=>prompt_text<#text>}"
+    }
+  },
+  "50": {
+    "inputs": {
+      "value": "你好，我是通义生成式语音大模型，请问有什么可以帮您的吗"
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "TTS Text ARG:{value=>tts_text<#text>}"
+    }
+  },
+  "57": {
+    "inputs": {
+      "model": ["43", 0],
+      "prompt_audio": ["62", 0],
+      "prompt_text": ["49", 0],
+      "tts_text": ["50", 0],
+      "instruct_text": "",
+      "is_japanese": false,
+      "inference_type": "zero_shot",
+      "speed": 1
+    },
+    "class_type": "CosyVoiceInference",
+    "_meta": {
+      "title": "CosyVoiceInference ARG:{inference_type=>inference_type<#label>,speed=>speed<#real>,is_japanese=>is_japanese<#bool>,instruct_text=>instruction_text<#text>}"
+    }
+  },
+  "58": {
+    "inputs": {
+      "audio": ["69", 0],
+      "filename_prefix": "audio/ComfyUI",
+      "quality": "128k",
+      "audioUI": ""
+    },
+    "class_type": "SaveAudioOpus",
+    "_meta": {
+      "title": "Save Audio (Opus)"
+    }
+  },
+  "62": {
+    "inputs": {
+      "audio": "Linyin.wav",
+      "audioUI": ""
+    },
+    "class_type": "LoadAudio",
+    "_meta": {
+      "title": "LoadAudio ARG:{audio=>prompt_audio<#audio>}"
+    }
+  },
+  "64": {
+    "inputs": {
+      "model": ["68", 0],
+      "reference_audio": ["62", 0],
+      "text": "你好，欢迎使用 Fish Speech。",
+      "reference_text": ["50", 0],
+      "is_japanese": false,
+      "chunk_length": 200,
+      "max_new_tokens": 1024,
+      "top_p": 0.8,
+      "repetition_penalty": 1.1,
+      "temperature": 0.8,
+      "seed": 69515679
+    },
+    "class_type": "FishSpeechTTS",
+    "_meta": {
+      "title": "FishSpeechTTS ARG:{is_japanese=>is_japanese<#bool>}"
+    }
+  },
+  "68": {
+    "inputs": {
+      "llama_checkpoint_path": "/mist/dengliang/fish-speech/checkpoints/fs-int8-20260427_182050",
+      "device": "auto",
+      "decoder_device": "same_as_model",
+      "precision": "bfloat16",
+      "compile": true
+    },
+    "class_type": "FishSpeechModelLoader",
+    "_meta": {
+      "title": "FishSpeechModelLoader ARG:{llama_checkpoint_path=>fishspeech_model_path<#label>,compile=>compile<#bool>}"
+    }
+  },
+  "69": {
+    "inputs": {
+      "input_if_true": ["64", 0],
+      "input_if_false": ["57", 0],
+      "condition": false
+    },
+    "class_type": "ConditionalBranchAudio",
+    "_meta": {
+      "title": "ConditionalBranchAudio ARG:{condition=>is_japanese<#bool>}"
+    }
+  },
+  "82": {
+    "inputs": {
+      "audio": ["69", 0],
+      "filename_prefix": "audio/ComfyUI",
+      "quality": "128k",
+      "audioUI": ""
+    },
+    "class_type": "SaveAudioMP3",
+    "_meta": {
+      "title": "Save Audio (MP3)"
+    }
+  }
+}
