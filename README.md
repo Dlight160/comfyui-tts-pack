@@ -37,8 +37,6 @@ git submodule update --init --recursive
 
 ### FishSpeech
 
-从 HuggingFace 下载：
-
 ```bash
 /mist/dengliang/fish-speech/checkpoints/fs-int8-20260427_182050
 ```
