@@ -375,6 +375,10 @@ class FishSpeechTTS:
     CATEGORY = "TTS/FishSpeech"
     TITLE = "FishSpeech TTS"
 
+    @classmethod
+    def IS_CHANGED(s, **kwargs):
+        return datetime.now().timestamp()
+        
     def generate(
         self,
         model: TTSInferenceEngine,

@@ -9,7 +9,7 @@ ComfyUI 自定义节点，集成 **CosyVoice 2** 和 **FishSpeech** 两种 TTS �
 cd ComfyUI/custom_nodes/
 
 # 2. 克隆仓库（包含子模块）
-git clone --recursive https://github.com/your-org/comfyui-tts-pack.git
+git clone --recursive https://github.com/Dlight160/comfyui-tts-pack.git
 
 # 3. 创建python3.12的conda环境
 conda create -n comfy-tts-pack python=3.12
