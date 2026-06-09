@@ -2,7 +2,7 @@
   "43": {
     "inputs": {
       "model_path": "/mist/dengliang/cosy/pretrained_models/CosyVoice2-0.5B",
-      "vllm": true
+      "vllm": false
     },
     "class_type": "CosyVoiceModelLoader",
     "_meta": {

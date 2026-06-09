@@ -11,12 +11,16 @@ cd ComfyUI/custom_nodes/
 # 2. 克隆仓库（包含子模块）
 git clone --recursive https://github.com/Dlight160/comfyui-tts-pack.git
 
-# 3. 创建python3.12的conda环境
+# 3. 创建 python3.12 的 conda 环境
 conda create -n comfy-tts-pack python=3.12
 conda activate comfy-tts-pack
 
-# 4. 安装依赖
-cd comfyui-tts-pack
+# 4. 先安装 ComfyUI 自身依赖（避免版本冲突）
+cd ../../
+pip install -r requirements.txt
+cd custom_nodes/comfyui-tts-pack
+
+# 5. 再安装 TTS Pack 依赖
 pip install -r requirements.txt
 ```
 
@@ -27,28 +31,33 @@ cd ComfyUI/custom_nodes/comfyui-tts-pack
 git submodule update --init --recursive
 ```
 
-## 本地模型路径
-
-### CosyVoice
-
-```bash
-/mist/dengliang/cosy/pretrained_models/CosyVoice2-0.5B
-```
-
-### FishSpeech
-
-```bash
-/mist/dengliang/fish-speech/checkpoints/fs-int8-20260427_182050
-```
-
 ## 模型路径配置
 
-默认路径为 `ComfyUI/models/tts/<engine>/...`，可通过环境变量覆盖：
+### 方式一：extra_model_paths.yaml（推荐）
 
-| 环境变量 | 作用 |
-|---|---|
-| `COSYVOICE_MODEL_PATH` | CosyVoice 模型路径 |
-| `FISH_LLAMA_PATH` | FishSpeech LLAMA 检查点路径 |
+在 ComfyUI 根目录的 `extra_model_paths.yaml`（没有则新建）中添加路径：
+
+```yaml
+shared:
+  base_path: /path/to/your/models
+  cosyvoice: models/tts/cosyvoice/
+  fishspeech: models/tts/fishspeech/
+```
+
+`cosyvoice` 和 `fishspeech` 指向的目录下按模型版本创建子目录，例如：
+
+```
+/path/to/your/models/
+└── models/tts/
+    ├── cosyvoice/
+    │   └── CosyVoice2-0.5B/
+    ├── fishspeech/
+    │   └── fs-int8-20260427_182050/
+```
+
+配置完成后重启 ComfyUI，节点输入框会自动填入对应路径。
+
+### 方式二：直接在节点中输入
 
 也可以在 ComfyUI 节点的输入框中手动修改路径。
 
@@ -72,7 +81,7 @@ git submodule update --init --recursive
 - **音频路由**：`ConditionalBranchAudio` 根据条件选择输出源（方便对比两个引擎的效果）
 - **输出**：同时接入 `SaveAudioOpus` 和 `SaveAudioMP3` 两种格式
 
-使用前需将工作流中 `CosyVoiceModelLoader.model_path` 和 `FishSpeechModelLoader.llama_checkpoint_path` 修改为本地实际路径。
+使用前需确保模型路径已正确配置。如果已配置 `extra_model_paths.yaml`，节点会自动填入路径；否则需在节点输入框中手动填写本地实际路径。
 
 ## 子模块说明
 

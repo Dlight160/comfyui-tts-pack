@@ -12,6 +12,8 @@ import soundfile as sf
 import torch
 import torchaudio
 
+import folder_paths
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
@@ -69,18 +71,24 @@ def _resolve_device(device: str) -> str:
 
 # ── CosyVoice nodes ──────────────────────────────────────────────────────────
 
-COSY_DEFAULT_MODEL_PATH = os.environ.get(
-    "COSYVOICE_MODEL_PATH",
-    os.path.join(os.path.dirname(current_dir), "models", "tts", "cosyvoice", "CosyVoice2-0.5B"),
-)
+def _get_first_model_path(folder_name: str) -> str:
+    """Return the first path registered for *folder_name* via ``extra_model_paths.yaml``,
+    or an empty string when none is configured."""
+    try:
+        paths = folder_paths.get_folder_paths(folder_name)
+        return paths[0] if paths else ""
+    except KeyError:
+        return ""
+
+COSY_DEFAULT_MODEL_PATH = _get_first_model_path("cosyvoice")
 
 class CosyVoiceModelLoader:
     @classmethod
     def INPUT_TYPES(s):
         return {
-            "required": {
+            "optional": {
                 "model_path": ("STRING", {"default": COSY_DEFAULT_MODEL_PATH}),
-                "vllm": ("BOOLEAN", {"default": True}),
+                "vllm": ("BOOLEAN", {"default": False}),
             },
         }
 
@@ -91,6 +99,8 @@ class CosyVoiceModelLoader:
     TITLE = "CosyVoice2 Model Loader"
 
     def load_model(self, model_path, vllm):
+        if not model_path:
+            model_path = COSY_DEFAULT_MODEL_PATH
         if vllm:
             # only patch EngineArgs when CosyVoice uses vLLM
             try:
@@ -188,10 +198,7 @@ class CosyVoiceInference:
 
 # ── FishSpeech nodes ─────────────────────────────────────────────────────────
 
-FISH_DEFAULT_LLAMA_PATH = os.environ.get(
-    "FISH_LLAMA_PATH",
-    os.path.join(os.path.dirname(current_dir), "models", "tts", "fish-speech", "fs-int8"),
-)
+FISH_DEFAULT_LLAMA_PATH = _get_first_model_path("fishspeech")
 
 _FISH_MODEL_CACHE: dict[tuple, TTSInferenceEngine] = {}
 _FISH_PATCHED_SEND_LLAMA = False
@@ -255,7 +262,7 @@ class FishSpeechModelLoader:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
+            "optional": {
                 "llama_checkpoint_path": ("STRING", {"default": FISH_DEFAULT_LLAMA_PATH}),
                 "device": (["auto", "cuda", "mps", "cpu"], {"default": "auto"}),
                 "decoder_device": (["same_as_model", "cpu"], {"default": "same_as_model"}),
@@ -278,6 +285,8 @@ class FishSpeechModelLoader:
         precision: str,
         compile: bool,
     ):
+        if not llama_checkpoint_path:
+            llama_checkpoint_path = FISH_DEFAULT_LLAMA_PATH
         resolved_device = _resolve_device(device)
         resolved_decoder_device = (
             resolved_device if decoder_device == "same_as_model" else decoder_device

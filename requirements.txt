@@ -45,38 +45,6 @@ transformers==4.57.1
 safetensors>=0.4.2
 pydantic==2.11.7
 
-# ===== ComfyUI =====
-comfyui-frontend-package==1.28.7
-comfyui-workflow-templates==0.2.1
-comfyui-embedded-docs==0.3.0
-torchsde
-torchvision
-tokenizers>=0.13.3
-sentencepiece
-aiohttp>=3.11.8
-yarl>=1.18.0
-pyyaml
-Pillow
-scipy
-tqdm
-psutil
-alembic
-SQLAlchemy
-av>=14.2.0
-kornia>=0.7.1
-spandrel
-pydantic-settings~=2.0
-GitPython
-PyGithub
-matrix-nio
-huggingface-hub>0.20
-typer
-rich
-typing-extensions
-toml
-uv
-chardet
-
 # ===== vllm-cosy-plugin (local) =====
 -e ./vllm-cosy-plugin
 
