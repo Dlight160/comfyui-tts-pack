@@ -79,7 +79,7 @@ shared:
 - **CosyVoice 链路**：`CosyVoiceModelLoader` → `CosyVoiceInference`（zero_shot 模式）
 - **FishSpeech 链路**：`FishSpeechModelLoader` → `FishSpeechTTS`
 - **音频路由**：`ConditionalBranchAudio` 根据条件选择输出源（方便对比两个引擎的效果）
-- **输出**：同时接入 `SaveAudioOpus` 和 `SaveAudioMP3` 两种格式
+- **输出**：`SaveAudioAdvanced` 可选 Opus / MP3 / FLAC 格式
 
 使用前需确保模型路径已正确配置。如果已配置 `extra_model_paths.yaml`，节点会自动填入路径；否则需在节点输入框中手动填写本地实际路径。
 

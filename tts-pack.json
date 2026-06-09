@@ -47,12 +47,12 @@
     "inputs": {
       "audio": ["69", 0],
       "filename_prefix": "audio/ComfyUI",
-      "quality": "128k",
-      "audioUI": ""
+      "format": "opus",
+      "format.quality": "128k"
     },
-    "class_type": "SaveAudioOpus",
+    "class_type": "SaveAudioAdvanced",
     "_meta": {
-      "title": "Save Audio (Opus)"
+      "title": "Save Audio ARG:{format=>format<#label>, format.quality=>quality<#label>}"
     }
   },
   "62": {
@@ -107,17 +107,5 @@
     "_meta": {
       "title": "ConditionalBranchAudio ARG:{condition=>is_japanese<#bool>}"
     }
-  },
-  "82": {
-    "inputs": {
-      "audio": ["69", 0],
-      "filename_prefix": "audio/ComfyUI",
-      "quality": "128k",
-      "audioUI": ""
-    },
-    "class_type": "SaveAudioMP3",
-    "_meta": {
-      "title": "Save Audio (MP3)"
-    }
   }
-}
+  }
