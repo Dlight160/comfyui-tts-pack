@@ -55,6 +55,38 @@ from fish_speech.utils.schema import ServeReferenceAudio, ServeTTSRequest
 
 PROMPT_SR = 16000
 
+
+# TTS search roots (for resolving relative model paths) ──────────────────────
+_TTS_ROOTS: list[str] = []
+
+_models_tts = os.path.join(folder_paths.models_dir, "tts")
+if os.path.isdir(_models_tts):
+    _TTS_ROOTS.append(os.path.abspath(_models_tts))
+
+try:
+    _TTS_ROOTS.extend(os.path.abspath(p) for p in folder_paths.get_folder_paths("tts"))
+except KeyError:
+    pass
+
+def _resolve_model_path(model_path: str, fallback: str = "") -> str:
+    """Resolve a user-supplied model path.
+
+    * Empty / whitespace-only      → return *fallback*.
+    * Absolute path                → use as-is.
+    * Relative path                → try against each ``_TTS_ROOTS`` in order.
+    * Still not found              → return as-is (let downstream raise).
+    """
+    if not model_path or not model_path.strip():
+        return fallback
+    path = model_path.strip()
+    if os.path.isabs(path):
+        return os.path.abspath(path)
+    for root in _TTS_ROOTS:
+        candidate = os.path.join(root, path)
+        if os.path.isdir(candidate):
+            return candidate
+    return path
+
 def _resolve_device(device: str) -> str:
     if device == "auto":
         if torch.cuda.is_available():
@@ -70,17 +102,7 @@ def _resolve_device(device: str) -> str:
 
 
 # ── CosyVoice nodes ──────────────────────────────────────────────────────────
-
-def _get_first_model_path(folder_name: str) -> str:
-    """Return the first path registered for *folder_name* via ``extra_model_paths.yaml``,
-    or an empty string when none is configured."""
-    try:
-        paths = folder_paths.get_folder_paths(folder_name)
-        return paths[0] if paths else ""
-    except KeyError:
-        return ""
-
-COSY_DEFAULT_MODEL_PATH = _get_first_model_path("cosyvoice")
+COSY_DEFAULT_MODEL_PATH = "/mist/dengliang/cosy/pretrained_models/CosyVoice2-0.5B"
 
 class CosyVoiceModelLoader:
     @classmethod
@@ -98,9 +120,8 @@ class CosyVoiceModelLoader:
     CATEGORY = "TTS/CosyVoice"
     TITLE = "CosyVoice2 Model Loader"
 
-    def load_model(self, model_path, vllm):
-        if not model_path:
-            model_path = COSY_DEFAULT_MODEL_PATH
+    def load_model(self, model_path="", vllm=False):
+        model_path = _resolve_model_path(model_path, COSY_DEFAULT_MODEL_PATH)
         if vllm:
             # only patch EngineArgs when CosyVoice uses vLLM
             try:
@@ -198,7 +219,7 @@ class CosyVoiceInference:
 
 # ── FishSpeech nodes ─────────────────────────────────────────────────────────
 
-FISH_DEFAULT_LLAMA_PATH = _get_first_model_path("fishspeech")
+FISH_DEFAULT_LLAMA_PATH = '/mist/dengliang/fish-speech/checkpoints/fs-int8-20260427_182050'
 
 _FISH_MODEL_CACHE: dict[tuple, TTSInferenceEngine] = {}
 _FISH_PATCHED_SEND_LLAMA = False
@@ -279,14 +300,13 @@ class FishSpeechModelLoader:
 
     def load_model(
         self,
-        llama_checkpoint_path: str,
-        device: str,
-        decoder_device: str,
-        precision: str,
-        compile: bool,
+        llama_checkpoint_path="",
+        device: str = "auto",
+        decoder_device: str = "same_as_model",
+        precision: str = "bfloat16",
+        compile: bool = True,
     ):
-        if not llama_checkpoint_path:
-            llama_checkpoint_path = FISH_DEFAULT_LLAMA_PATH
+        llama_checkpoint_path = _resolve_model_path(llama_checkpoint_path, FISH_DEFAULT_LLAMA_PATH)
         resolved_device = _resolve_device(device)
         resolved_decoder_device = (
             resolved_device if decoder_device == "same_as_model" else decoder_device

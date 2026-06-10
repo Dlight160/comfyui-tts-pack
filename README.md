@@ -33,33 +33,25 @@ git submodule update --init --recursive
 
 ## 模型路径配置
 
-### 方式一：extra_model_paths.yaml（推荐）
+模型路径可以通过以下两种方式传入节点：
 
-在 ComfyUI 根目录的 `extra_model_paths.yaml`（没有则新建）中添加路径：
+### 方式一：使用默认路径（开箱即用）
 
-```yaml
-shared:
-  base_path: /path/to/your/models
-  cosyvoice: models/tts/cosyvoice/
-  fishspeech: models/tts/fishspeech/
-```
+节点输入框已预填默认路径，无需额外配置即可使用。
 
-`cosyvoice` 和 `fishspeech` 指向的目录下按模型版本创建子目录，例如：
+### 方式二：自定义路径
 
-```
-/path/to/your/models/
-└── models/tts/
-    ├── cosyvoice/
-    │   └── CosyVoice2-0.5B/
-    ├── fishspeech/
-    │   └── fs-int8-20260427_182050/
-```
+在节点的 `model_path`（或 `llama_checkpoint_path`）输入框中填写路径，支持两种格式：
 
-配置完成后重启 ComfyUI，节点输入框会自动填入对应路径。
+- **绝对路径** — 直接使用该路径加载模型  
+  例如：`/data/models/CosyVoice2-0.5B`
+- **相对路径** — 从以下搜索目录中查找：
+  1. `ComfyUI/models/tts/`
+  2. `extra_model_paths.yaml` 中注册的 `tts` 路径（如有配置）
 
-### 方式二：直接在节点中输入
+  例如：`CosyVoice/CosyVoice2-0.5B` 会依次检查 `models/tts/CosyVoice/CosyVoice2-0.5B` 等路径。
 
-也可以在 ComfyUI 节点的输入框中手动修改路径。
+留空则使用代码中预设的默认路径。
 
 ## 节点说明
 
@@ -81,7 +73,7 @@ shared:
 - **音频路由**：`ConditionalBranchAudio` 根据条件选择输出源（方便对比两个引擎的效果）
 - **输出**：`SaveAudioAdvanced` 可选 Opus / MP3 / FLAC 格式
 
-使用前需确保模型路径已正确配置。如果已配置 `extra_model_paths.yaml`，节点会自动填入路径；否则需在节点输入框中手动填写本地实际路径。
+使用前需确保模型路径正确。节点输入框已预填默认路径，如需使用其他路径，可直接修改输入框（支持绝对路径或相对路径）。
 
 ## 子模块说明
 
