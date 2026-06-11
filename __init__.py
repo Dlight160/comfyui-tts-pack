@@ -102,14 +102,14 @@ def _resolve_device(device: str) -> str:
 
 
 # ── CosyVoice nodes ──────────────────────────────────────────────────────────
-COSY_DEFAULT_MODEL_PATH = "/mist/dengliang/cosy/pretrained_models/CosyVoice2-0.5B"
+COSY_DEFAULT_MODEL_PATH = "CosyVoice2-0.5B"
 
 class CosyVoiceModelLoader:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "optional": {
-                "model_path": ("STRING", {"default": COSY_DEFAULT_MODEL_PATH}),
+                "model_path": ("STRING", {"default": COSY_DEFAULT_MODEL_PATH, "tooltip": "relative path to models/tts, or absolute path"}),
                 "vllm": ("BOOLEAN", {"default": False}),
             },
         }
@@ -219,7 +219,7 @@ class CosyVoiceInference:
 
 # ── FishSpeech nodes ─────────────────────────────────────────────────────────
 
-FISH_DEFAULT_LLAMA_PATH = '/mist/dengliang/fish-speech/checkpoints/fs-int8-20260427_182050'
+FISH_DEFAULT_LLAMA_PATH = 'fs-int8-20260427_182050'
 
 _FISH_MODEL_CACHE: dict[tuple, TTSInferenceEngine] = {}
 _FISH_PATCHED_SEND_LLAMA = False
@@ -284,7 +284,7 @@ class FishSpeechModelLoader:
     def INPUT_TYPES(cls):
         return {
             "optional": {
-                "llama_checkpoint_path": ("STRING", {"default": FISH_DEFAULT_LLAMA_PATH}),
+                "llama_checkpoint_path": ("STRING", {"default": FISH_DEFAULT_LLAMA_PATH, "tooltip": "relative path to models/tts, or absolute path"}),
                 "device": (["auto", "cuda", "mps", "cpu"], {"default": "auto"}),
                 "decoder_device": (["same_as_model", "cpu"], {"default": "same_as_model"}),
                 "precision": (["bfloat16", "float16"], {"default": "bfloat16"}),
