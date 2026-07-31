@@ -15,14 +15,15 @@ git clone --recursive https://github.com/Dlight160/comfyui-tts-pack.git
 conda create -n comfy-tts-pack python=3.12
 conda activate comfy-tts-pack
 
-# 4. 先安装 ComfyUI 自身依赖（避免版本冲突）
+# 4. 从 ComfyUI 根目录一次性安装 ComfyUI 与 TTS Pack 依赖
 cd ../../
-pip install -r requirements.txt
-cd custom_nodes/comfyui-tts-pack
-
-# 5. 再安装 TTS Pack 依赖
-pip install -r requirements.txt
+python -m pip install \
+  -c custom_nodes/comfyui-tts-pack/constraints-tts-cu128.txt \
+  -r requirements.txt \
+  -r custom_nodes/comfyui-tts-pack/requirements.txt
 ```
+
+两份依赖在同一次 pip 解析中应用 CUDA 12.8 约束，可避免分步安装后残留不兼容的 CUDA/PyTorch 依赖。
 
 如果已经 clone 了但忘了 `--recursive`：
 

@@ -1,5 +1,4 @@
 # ===== CosyVoice (pruned for __init__.py inference use) =====
-vllm==0.11.0
 conformer
 deepspeed
 diffusers
@@ -10,7 +9,7 @@ HyperPyYAML
 inflect
 librosa
 pyarrow
-pyworld
+pyworld==0.3.5
 omegaconf
 openai-whisper
 onnxruntime-gpu
@@ -20,6 +19,7 @@ x-transformers==2.11.24
 # tensorrt-cu12可能需要手动安装 
 # 命令：pip install tensorrt-cu12==10.13.3.9 -i https://pypi.tuna.tsinghua.edu.cn/simple --extra-index-url https://pypi.nvidia.com
 tensorrt-cu12==10.13.3.9; sys_platform == 'linux' 
+setuptools<82
 
 # ===== FishSpeech =====
 hydra-core>=1.3.2
@@ -35,17 +35,15 @@ descript-audiotools
 einx[torch]
 soundfile
 opencc-python-reimplemented==0.1.7
+click
 
 # ===== Shared (stricter merged versions) =====
 torch==2.8.0
 torchaudio==2.8.0
+torchvision==0.23.0
 numpy==1.26.4
 einops>=0.7.0
 transformers==4.57.1
 safetensors>=0.4.2
 pydantic==2.11.7
-
-# ===== vllm-cosy-plugin (local) =====
--e ./vllm-cosy-plugin
-
 cbor2==5.9.0
